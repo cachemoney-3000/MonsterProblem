@@ -60,7 +60,7 @@ void traverse(struct Node* last) {
     do {
         printf("%d ", p->data);
         fprintf(out, "%d ", p->data);
-        
+
         p = p->next;
 
     } while (p != last->next);
@@ -230,13 +230,12 @@ int main() {
     int numKingdoms;
     fscanf(in, "%d", &numKingdoms);
 
+    int kingdomNumber;
+    int numMonsters;
+    int kill;
+    int numSave;
     Kingdom* kingdom = malloc(numKingdoms * sizeof(Kingdom));
     for (i = 0; i < numKingdoms; i++){
-        int kingdomNumber;
-        int numMonsters;
-        int kill;
-        int numSave;
-
         // Scan the each lines and populate the data on the structs
         fscanf(in, "%d %d %d %d", &kingdomNumber, &numMonsters, &kill, &numSave);
         kingdom[i].kingdomNumber = kingdomNumber;
@@ -258,6 +257,7 @@ int main() {
     printf("Initial nonempty lists status\n");
     fprintf(out,"Initial nonempty lists status\n");
 
+    // Prints out the list in each kingdom
     for (i = 0; i < numKingdoms; i++){
         printf("%d ", kingdom[i].kingdomNumber);
         traverse(kingdom[i].node);
@@ -270,6 +270,7 @@ int main() {
     printf("\nAfter ordering nonempty lists status\n");
     fprintf(out, "\nAfter ordering nonempty lists status\n");
 
+    // Prints out the sorted list in each kingdom
     for (i = 0; i < numKingdoms; i++){
         printf("%d ", kingdom[i].kingdomNumber);
         fprintf(out, "%d ", kingdom[i].kingdomNumber);
@@ -284,6 +285,7 @@ int main() {
     printf("\nPhase1 execution\n\n");
     fprintf(out,"\nPhase1 execution\n\n");
 
+    // Phase 1 execution, remove a data every kth node
     int totalSaved = 0;
     for (i = 0; i < numKingdoms; i++){
         int index = kingdom[i].kill;
@@ -293,8 +295,10 @@ int main() {
         printf("Line# %d\n", kingdom[i].kingdomNumber);
         fprintf(out, "Line# %d\n", kingdom[i].kingdomNumber);
 
+        // Loop until the total monsters left is equal to the monster that will be saved
         Node* cur = kingdom[i].node;
         for (j = 0; j < numKill; j++) {
+            // Execute the monster every kth node
             cur = traverse_k(cur, index);
             int killNode = cur->data;
             cur = deleteNode(cur, cur->data);
@@ -305,21 +309,34 @@ int main() {
         printf("\n");
         fprintf(out, "\n");
 
+        // Update the data
         kingdom[i].node = cur;
         kingdom[i].numMonsters = save;
+        // Counts how many monsters are saved in each loop
         totalSaved = totalSaved + save;
     }
 
+
+    // Phase 2 execution
+    printf("\nPhase2 execution\n\n");
+    fprintf(out,"\nPhase2 execution\n\n");
+
+    // Sort the kingdoms by the sequence number of each kingdoms 
     SortBySequence(kingdom, numKingdoms);
+    // Loop through all the kingdoms
     for (i = 0; i < numKingdoms; i++) {
+        // Keep killing the monsters 
         while (kingdom[i].node != NULL)
         {
+            // Stop killing until there is only one monster left in all of the kingdoms
             if (totalSaved == 1) {
+                // Declare the winner
                 printf("\nMonster %d from line %d will survive\n", kingdom[i].node->data, kingdom[i].kingdomNumber);
                 fprintf(out, "\nMonster %d from line %d will survive\n", kingdom[i].node->data, kingdom[i].kingdomNumber);
 
                 break;
             }
+            // Kill each monsters
             kingdom[i].node = traverse_k(kingdom[i].node, 1);
             int killNode = kingdom[i].node->data;
             kingdom[i].node = deleteNode(kingdom[i].node, kingdom[i].node->data);
@@ -327,8 +344,17 @@ int main() {
             printf("Executed Monster %d from line %d\n", killNode, kingdom[i].kingdomNumber);
             fprintf(out, "Executed Monster %d from line %d\n", killNode, kingdom[i].kingdomNumber);
 
+            // Update the monsters left
             totalSaved--;
         }
     }
 
+
+    // Free the memory
+    for (i = 0; i < numKingdoms; i++){
+        free(kingdom[i].node);
+    }
+    free(kingdom);
+
+    return 0;
 }
