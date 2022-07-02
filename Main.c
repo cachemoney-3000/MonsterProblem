@@ -21,6 +21,47 @@ typedef struct Kingdom {
     Node* head;
 } Kingdom;
 
+Node* add(Node* last, int data);
+void traverse(struct Node* last);
+Node* reverse(Node* last);
+void SortByNumber (Kingdom* kingdom, int n);
+void SortBySequence (Kingdom* kingdom, int n);
+Node* traverse_k(Node* cur, int k);
+Node* deleteNode(struct Node* head, int key);
+void printList(struct Node *head);
+Kingdom* scanAndInsert(int numKingdoms);
+void printSortedMonsters(Kingdom* kingdom, int numKingdoms);
+int phaseOne(int numKingdoms, Kingdom* kingdom);
+void phaseTwo(Kingdom* kingdom, int numKingdoms, int totalSaved);
+void freeMemory(Kingdom* kingdom, int numKingdoms);
+
+int main() {
+    // Open the file
+    in = fopen("in.txt", "r");
+    out = fopen("out.txt", "w");
+    
+    if(in == NULL) {
+        printf("File not found");
+        exit(1);
+    }
+
+    // Scan how many kingdoms are there
+    int numKingdoms;
+    fscanf(in, "%d", &numKingdoms);
+    // Populate the monster list in each kingdom
+    Kingdom* kingdom = scanAndInsert(numKingdoms);
+
+    // Sort by kingdom number then print each list
+    printSortedMonsters(kingdom, numKingdoms);
+    // Phase 1 execution, remove a data every kth node, then get how many monsters are saved
+    int totalSaved = phaseOne(numKingdoms, kingdom);
+    // Phase 2 execution
+    phaseTwo(kingdom, numKingdoms, totalSaved);
+    // Free the memory
+    freeMemory(kingdom, numKingdoms);
+
+    return 0;
+}
 
 Node* add(Node* last, int data) {
     Node* newNode = malloc(sizeof(Node));
@@ -65,7 +106,6 @@ void traverse(struct Node* last) {
 
     } while (p != last->next);
 }
-
 
 // Reversing the circular linked list
 Node* reverse(Node* last) {
@@ -213,29 +253,15 @@ void printList(struct Node *head)
     }
 }
 
-
-int main() {
-    // Open the file
-    in = fopen("in.txt", "r");
-    out = fopen("out.txt", "w");
-    
-    if(in == NULL) {
-        printf("File not found");
-        exit(1);
-    }
-
-
+Kingdom* scanAndInsert(int numKingdoms) {
     int i, j;
-    // Scan how many kingdoms are there
-    int numKingdoms;
-    fscanf(in, "%d", &numKingdoms);
-
-    int kingdomNumber;
-    int numMonsters;
-    int kill;
-    int numSave;
     Kingdom* kingdom = malloc(numKingdoms * sizeof(Kingdom));
     for (i = 0; i < numKingdoms; i++){
+        int kingdomNumber;
+        int numMonsters;
+        int kill;
+        int numSave;
+
         // Scan the each lines and populate the data on the structs
         fscanf(in, "%d %d %d %d", &kingdomNumber, &numMonsters, &kill, &numSave);
         kingdom[i].kingdomNumber = kingdomNumber;
@@ -251,8 +277,13 @@ int main() {
         }
     }
 
+    return kingdom;
+}
+
+void printSortedMonsters(Kingdom* kingdom, int numKingdoms) {
     // Sort by kingdom number
     SortByNumber(kingdom, numKingdoms);
+    int i;
 
     printf("Initial nonempty lists status\n");
     fprintf(out,"Initial nonempty lists status\n");
@@ -281,7 +312,10 @@ int main() {
         printf("\n");
         fprintf(out, "\n");
     }
+}
 
+int phaseOne(int numKingdoms, Kingdom* kingdom){
+    int i, j;
     printf("\nPhase1 execution\n\n");
     fprintf(out,"\nPhase1 execution\n\n");
 
@@ -315,8 +349,11 @@ int main() {
         // Counts how many monsters are saved in each loop
         totalSaved = totalSaved + save;
     }
+    return totalSaved;
+}
 
-
+void phaseTwo(Kingdom* kingdom, int numKingdoms, int totalSaved) {
+    int i;
     // Phase 2 execution
     printf("\nPhase2 execution\n\n");
     fprintf(out,"\nPhase2 execution\n\n");
@@ -348,13 +385,13 @@ int main() {
             totalSaved--;
         }
     }
+}
 
-
+void freeMemory(Kingdom* kingdom, int numKingdoms){
+    int i;
     // Free the memory
     for (i = 0; i < numKingdoms; i++){
         free(kingdom[i].node);
     }
     free(kingdom);
-
-    return 0;
 }
