@@ -12,7 +12,6 @@ typedef struct Node{
     struct Node* next;
 } Node;
 
-
 typedef struct Kingdom {
     int kingdomNumber;
     int numMonsters;
@@ -21,12 +20,6 @@ typedef struct Kingdom {
     Node* node;
     Node* head;
 } Kingdom;
-
-typedef struct KingdomIndex {
-    int key;
-    int data;
-} KingdomIndex;
-
 
 
 Node* add(Node* last, int data) {
@@ -53,30 +46,30 @@ Node* add(Node* last, int data) {
     return last;
 }
 
+// Traverse the linked list and print the data
 void traverse(struct Node* last) {
-  struct Node* p = last;
+    struct Node* p = last;
 
-  if (last == NULL) {
-  printf("The list is empty");
-  return;
-  }
+    if (last == NULL) {
+        printf("The list is empty");
+        return;
+    }
 
-  p = last->next;
+    p = last->next;
 
-  do {
-    printf("%d ", p->data);
-    p = p->next;
+    do {
+        printf("%d ", p->data);
+        fprintf(out, "%d ", p->data);
+        
+        p = p->next;
 
-  } while (p != last->next);
+    } while (p != last->next);
 }
 
 
-
+// Reversing the circular linked list
 Node* reverse(Node* last) {
-    
     Node* prev = NULL;
-    
-
     Node* cur = last;
     Node* next;
     
@@ -93,10 +86,12 @@ Node* reverse(Node* last) {
     return last;
 }
 
+// Sort the kingdom by kingdom number
 void SortByNumber (Kingdom* kingdom, int n) {
     int i, j;
     Kingdom temp;
 
+    // Loop through all the kingdoms and compare their compare number then sort
     for (i = 0; i < n - 1; i++) {
         for (j = i + 1; j < n; j++) {
             if (kingdom[i].kingdomNumber > kingdom[j].kingdomNumber){
@@ -108,13 +103,15 @@ void SortByNumber (Kingdom* kingdom, int n) {
     }
 }
 
-
+// Sort the kingdoms by the first sequence number on their node
 void SortBySequence (Kingdom* kingdom, int n) {
     int i, j;
     Kingdom temp;
 
+    // Loop through all the kingdoms
     for (i = 0; i < n - 1; i++) {
         for (j = i + 1; j < n; j++) {
+            // If there is a tie on the first data on their linked list, sort them by kingdom number
             if (kingdom[i].node->data == kingdom[j].node->data) {
                 if (kingdom[i].kingdomNumber > kingdom[j].kingdomNumber){
                     temp = kingdom[i];
@@ -123,6 +120,7 @@ void SortBySequence (Kingdom* kingdom, int n) {
                 }
             }
 
+            // Sort by kingdom number
             else if (kingdom[i].node->data < kingdom[j].node->data){
                 temp = kingdom[i];
                 kingdom[i] = kingdom[j];
@@ -132,7 +130,7 @@ void SortBySequence (Kingdom* kingdom, int n) {
     }
 }
 
-
+// Traverse the circular linked list and stops at the kth node
 Node* traverse_k(Node* cur, int k) {
     int i;
     for (i = 1; i < k; i++) {
@@ -198,8 +196,7 @@ Node* deleteNode(struct Node* head, int key)
     return head;
 }
 
-
-
+// Prints the linked list
 void printList(struct Node *head)
 {
     struct Node *temp = head;
@@ -208,6 +205,8 @@ void printList(struct Node *head)
         do
         {
             printf("%d ", temp->data);
+            fprintf(out, "%d ", temp->data);
+
             temp = temp->next;
         }
         while (temp != head);
@@ -216,7 +215,9 @@ void printList(struct Node *head)
 
 
 int main() {
+    // Open the file
     in = fopen("in.txt", "r");
+    out = fopen("out.txt", "w");
     
     if(in == NULL) {
         printf("File not found");
@@ -225,6 +226,7 @@ int main() {
 
 
     int i, j;
+    // Scan how many kingdoms are there
     int numKingdoms;
     fscanf(in, "%d", &numKingdoms);
 
@@ -235,16 +237,12 @@ int main() {
         int kill;
         int numSave;
 
-
+        // Scan the each lines and populate the data on the structs
         fscanf(in, "%d %d %d %d", &kingdomNumber, &numMonsters, &kill, &numSave);
         kingdom[i].kingdomNumber = kingdomNumber;
         kingdom[i].numMonsters = numMonsters;
         kingdom[i].kill = kill;
         kingdom[i].numSave = numSave;
-
-
-
-        //printf("%d %d %d %d\n", kingdomNumber, numMonsters, kill, numSave);
 
         // Inserting to Node
         kingdom[i].node = NULL;
@@ -256,25 +254,36 @@ int main() {
 
     // Sort by kingdom number
     SortByNumber(kingdom, numKingdoms);
+
     printf("Initial nonempty lists status\n");
+    fprintf(out,"Initial nonempty lists status\n");
+
     for (i = 0; i < numKingdoms; i++){
         printf("%d ", kingdom[i].kingdomNumber);
         traverse(kingdom[i].node);
+
         printf("\n");
+        fprintf(out, "\n");
     }
 
     // Sort each kingdom in increasing order by reversing it
     printf("\nAfter ordering nonempty lists status\n");
+    fprintf(out, "\nAfter ordering nonempty lists status\n");
+
     for (i = 0; i < numKingdoms; i++){
         printf("%d ", kingdom[i].kingdomNumber);
+        fprintf(out, "%d ", kingdom[i].kingdomNumber);
 
         kingdom[i].node = reverse(kingdom[i].head);
 
         printList(kingdom[i].node);
         printf("\n");
+        fprintf(out, "\n");
     }
 
     printf("\nPhase1 execution\n\n");
+    fprintf(out,"\nPhase1 execution\n\n");
+
     int totalSaved = 0;
     for (i = 0; i < numKingdoms; i++){
         int index = kingdom[i].kill;
@@ -282,6 +291,8 @@ int main() {
         int numKill = kingdom[i].numMonsters - save;
 
         printf("Line# %d\n", kingdom[i].kingdomNumber);
+        fprintf(out, "Line# %d\n", kingdom[i].kingdomNumber);
+
         Node* cur = kingdom[i].node;
         for (j = 0; j < numKill; j++) {
             cur = traverse_k(cur, index);
@@ -289,8 +300,11 @@ int main() {
             cur = deleteNode(cur, cur->data);
 
             printf("Monster# %d executed\n", killNode);
+            fprintf(out, "Monster# %d executed\n", killNode);
         }
         printf("\n");
+        fprintf(out, "\n");
+
         kingdom[i].node = cur;
         kingdom[i].numMonsters = save;
         totalSaved = totalSaved + save;
@@ -298,18 +312,20 @@ int main() {
 
     SortBySequence(kingdom, numKingdoms);
     for (i = 0; i < numKingdoms; i++) {
-        
-
         while (kingdom[i].node != NULL)
         {
             if (totalSaved == 1) {
                 printf("\nMonster %d from line %d will survive\n", kingdom[i].node->data, kingdom[i].kingdomNumber);
+                fprintf(out, "\nMonster %d from line %d will survive\n", kingdom[i].node->data, kingdom[i].kingdomNumber);
+
                 break;
             }
             kingdom[i].node = traverse_k(kingdom[i].node, 1);
             int killNode = kingdom[i].node->data;
             kingdom[i].node = deleteNode(kingdom[i].node, kingdom[i].node->data);
+
             printf("Executed Monster %d from line %d\n", killNode, kingdom[i].kingdomNumber);
+            fprintf(out, "Executed Monster %d from line %d\n", killNode, kingdom[i].kingdomNumber);
 
             totalSaved--;
         }
