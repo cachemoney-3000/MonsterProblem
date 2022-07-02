@@ -6,7 +6,6 @@
 FILE *in;
 FILE *out;
 
-
 typedef struct Node{
     int data;
     struct Node* next;
